@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <script>
+        // Base64 encoded credentials (Mihir:123)
+        const encodedUser = "TWloaXI="; // Base64 of Mihir
+        const encodedPass = "MTIz"; // Base64 of 123
+
+        function checkLogin() {
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+
+            // Check if the encoded version of input matches the stored credentials
+            if (btoa(user) === encodedUser && btoa(pass) === encodedPass) {
+                // Store the username in sessionStorage
+                sessionStorage.setItem("username", user);
+                // Redirect to main.html
+                window.location.replace("main.html");
+            } else {
+                alert("Incorrect username or password.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>Login Page</h2>
+    <form onsubmit="event.preventDefault(); checkLogin();">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br><br>
+
+        <button type="submit">Log In</button>
+    </form>
+</body>
+</html>
