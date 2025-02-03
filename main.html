@@ -954,7 +954,7 @@ function downloadLotteryDetails(autoModeChecked) {
         y += 10;
     });
 
-    // Add Watermarks (Now perfectly covering the gaps)
+    // Add Watermarks
     addWatermarks(doc);
 
     doc.save("Lottery_Details.pdf");
@@ -963,8 +963,8 @@ function downloadLotteryDetails(autoModeChecked) {
 
 function addWatermarks(doc) {
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(150); // Light gray color
-    doc.setGState(new doc.GState({ opacity: 0.2 })); // Wash-out effect
+    doc.setTextColor(150);
+    doc.setGState(new doc.GState({ opacity: 0.2 })); 
 
     const watermarkText = "LotteryMachine by Mriganka (MMD)";
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -975,30 +975,28 @@ function addWatermarks(doc) {
     doc.text(watermarkText, pageWidth / 4, pageHeight / 2, { angle: 45 });
 
     // **Diagonal Watermarks (Smaller, Filling All Gaps)**
-    doc.setFontSize(22); // Smaller for better fit
+    doc.setFontSize(22);
 
-    const startX = -50; // Start slightly off-page for better coverage
+    const startX = -50;
     const startY = 30;
-    const stepY = 45; // Vertical spacing (slightly closer to fill gaps)
-    const stepX = 75; // Horizontal spacing (optimized to remove spaces)
+    const stepY = 45;
+    const stepX = 75;
 
     const centerX = pageWidth / 2;
     const centerY = pageHeight / 2;
-    const exclusionRadiusX = 100; // Keeps space around the center watermark
-    const exclusionRadiusY = 60;  // Adjusted to fill gaps above & below
+    const exclusionRadiusX = 100;
+    const exclusionRadiusY = 60;
 
     for (let y = startY; y < pageHeight + 100; y += stepY) {
         for (let x = startX; x < pageWidth + 100; x += stepX) {
-            // **Ensure diagonal watermarks do not leave gaps above & below center**
             if (
                 Math.abs(x - centerX) < exclusionRadiusX &&
                 Math.abs(y - centerY) < exclusionRadiusY
             ) {
-                // **Add watermarks slightly above & below the center**
                 if (y < centerY - exclusionRadiusY) {
-                    doc.text(watermarkText, x, y - 20, { angle: 45 }); // Slightly above
+                    doc.text(watermarkText, x, y - 20, { angle: 45 });
                 } else if (y > centerY + exclusionRadiusY) {
-                    doc.text(watermarkText, x, y + 20, { angle: 45 }); // Slightly below
+                    doc.text(watermarkText, x, y + 20, { angle: 45 });
                 }
                 continue;
             }
@@ -1007,6 +1005,33 @@ function addWatermarks(doc) {
     }
 }
 
+// Modal Functions
+function showModal(message, duration) {
+    const modal = createModal(message);
+    document.body.appendChild(modal);
+    setTimeout(() => {
+        modal.remove();
+        document.getElementById('rollingBox').innerText = "---";
+    }, duration);
+}
+
+function showConfirmationModal(message, callback) {
+  const modal = createModal(message, true);
+  document.body.appendChild(modal);
+
+  const confirmButton = modal.querySelector('.modal-confirm');
+  const cancelButton = modal.querySelector('.modal-cancel');
+
+  confirmButton.addEventListener('click', () => {
+    modal.remove();
+    callback(true);
+  });
+
+  cancelButton.addEventListener('click', () => {
+    modal.remove();
+    callback(false);
+  });
+}
 
 function createModal(message, isConfirmation = false) {
     const modal = document.createElement('div');
@@ -1020,7 +1045,7 @@ function createModal(message, isConfirmation = false) {
     return modal;
 }
 
-// Basic CSS for the modal (add to your stylesheet or <style> tag)
+// Basic CSS for the modal
 const style = document.createElement('style');
 style.textContent = `
 .modal {
@@ -1028,8 +1053,8 @@ style.textContent = `
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent backdrop */
-    z-index: 1000; /* Ensure it's on top */
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
     width: 100%;
     height: 100%;
     display: flex;
@@ -1042,7 +1067,7 @@ style.textContent = `
     padding: 20px;
     border-radius: 5px;
     text-align: center;
-    min-width: 300px; /* Ensure it's not too small */
+    min-width: 300px;
 }
 .modal-buttons{
     display:flex;
@@ -1066,6 +1091,14 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
+
+
+
+
+
+
+
+
 
         // Function to format date and time as "DD/MM/YYYY | 00:00:00 Hrs"
         function formatDateTime() {
