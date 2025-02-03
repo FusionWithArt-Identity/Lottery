@@ -924,7 +924,7 @@ function downloadLotteryDetails(autoModeChecked) {
         rollingFrequency = `${rolledCount} times (${frequencyPercentage}%)`;
     }
 
-    const content = `Lottery Details - \n\n${lotteryTitleSection}\nActual Lottery Range: ${startRange} - ${endRange}\nRolling Frequency: ${rollingFrequency}\nTotal Numbers in Range: ${totalNumbers}\nPicked Numbers: ${pickedNumbers.join(", ")} (${pickedNumbers.length})\nCancelled Numbers: ${cancelledNumbers.join(", ")} (${cancelledNumbers.length})\nRemoved Numbers: ${removedNumbers.join(", ")} (${removedNumbers.length})\nStatus: ${status}\n\nDate-Time: ${dateTime}`;
+    const content = `Lottery Details - \n\n${lotteryTitleSection}\nActual Lottery Range: ${startRange} - ${endRange}\nRolling Frequency: ${rollingFrequency}\nTotal Numbers in Range: ${totalNumbers}\nResult (All Picked Numbers): ${pickedNumbers.join(", ")} (${pickedNumbers.length})\nCancelled Numbers: ${cancelledNumbers.join(", ")} (${cancelledNumbers.length})\nRemoved Numbers: ${removedNumbers.join(", ")} (${removedNumbers.length})\nStatus: ${status}\n\nDate-Time: ${dateTime}`;
 
     const blob = new Blob([content], { type: 'application/rtf' });
     const link = document.createElement('a');
