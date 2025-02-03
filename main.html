@@ -868,6 +868,7 @@ resetButton.addEventListener('click', () => {
 
 
 
+
 document.getElementById('download').addEventListener('click', () => {
     const autoModeChecked = document.getElementById('autoModeCheckbox').checked;
 
@@ -926,9 +927,25 @@ function downloadLotteryDetails(autoModeChecked) {
         rollingFrequency = `${rolledCount} times (${frequencyPercentage}%)`;
     }
 
+    // **Title in Purple**
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#800080"); // Purple
+    doc.setFontSize(16);
+    doc.text("Lottery Details", 105, 20, { align: "center" });
+
+// **Exact Divider in Black**
+doc.setFontSize(12);
+doc.setTextColor(0, 0, 0); // Black color
+doc.text("----------------------------", 105, 28, { align: "center" }); // Same divider as before
+
+
+    // **All Other Details in Blue**
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#0000FF"); // Blue
+    doc.setFontSize(12);
+
+    let y = 40;
     const content = [
-        "Lottery Details",
-        "----------------------------",
         `${lotteryTitleSection}`,
         `Actual Lottery Range: ${startRange} - ${endRange}`,
         `Rolling Frequency: ${rollingFrequency}`,
@@ -936,23 +953,21 @@ function downloadLotteryDetails(autoModeChecked) {
         `Picked Numbers: ${pickedNumbers.join(", ")} (${pickedNumbers.length})`,
         `Cancelled Numbers: ${cancelledNumbers.join(", ")} (${cancelledNumbers.length})`,
         `Removed Numbers: ${removedNumbers.join(", ")} (${removedNumbers.length})`,
-        `Status: ${status}`,
-        "",
-        `Date-Time: ${dateTime}`
+        `Status: ${status}`
     ];
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("Lottery Details", 105, 20, { align: "center" });
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-
-    let y = 40;
     content.forEach(line => {
         doc.text(line, 105, y, { align: "center" });
         y += 10;
     });
+
+
+// **Extra Line Gap before Date-Time**
+y += 10; // Added extra line gap before Date-Time
+
+    // **Date & Time in Green**
+    doc.setTextColor("#008000"); // Green
+    doc.text(`Date-Time: ${dateTime}`, 105, y, { align: "center" });
 
     // Add Watermarks
     addWatermarks(doc);
@@ -1091,7 +1106,6 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
-
 
 
 
