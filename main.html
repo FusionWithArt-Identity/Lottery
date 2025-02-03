@@ -896,11 +896,13 @@ function checkIfAllNumbersRolled() {
 }
 
 function downloadLotteryDetails(autoModeChecked) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
     const lotteryHeader = document.getElementById('lotteryHeader');
     const savedLotteryName = lotteryName.trim();
 
     const currentTitle = lotteryHeader && lotteryHeader.value ? lotteryHeader.value.trim() : "";
-
     const isUnknownLottery = !(currentTitle === savedLotteryName && savedLotteryName !== "");
     const lotteryTitleSection = isUnknownLottery ? "Unknown Lottery" : `Lottery Title: ${savedLotteryName}`;
 
@@ -916,54 +918,93 @@ function downloadLotteryDetails(autoModeChecked) {
 
     const dateTime = new Date().toLocaleString();
 
-    // Calculate Rolling Frequency
-    let rollingFrequency = "N/A";  // Default to N/A for manual mode
+    // Rolling Frequency Calculation
+    let rollingFrequency = "N/A"; 
     if (autoModeChecked) {
-        const rolledCount = pickedNumbers.length;  // Assuming pickedNumbers gives the count of rolled numbers
+        const rolledCount = pickedNumbers.length; 
         const frequencyPercentage = ((rolledCount / totalNumbers) * 100).toFixed(2);
         rollingFrequency = `${rolledCount} times (${frequencyPercentage}%)`;
     }
 
-    const content = `Lottery Details - \n\n${lotteryTitleSection}\nActual Lottery Range: ${startRange} - ${endRange}\nRolling Frequency: ${rollingFrequency}\nTotal Numbers in Range: ${totalNumbers}\nResult (All Picked Numbers): ${pickedNumbers.join(", ")} (${pickedNumbers.length})\nCancelled Numbers: ${cancelledNumbers.join(", ")} (${cancelledNumbers.length})\nRemoved Numbers: ${removedNumbers.join(", ")} (${removedNumbers.length})\nStatus: ${status}\n\nDate-Time: ${dateTime}`;
+    const content = [
+        "Lottery Details",
+        "----------------------------",
+        `${lotteryTitleSection}`,
+        `Actual Lottery Range: ${startRange} - ${endRange}`,
+        `Rolling Frequency: ${rollingFrequency}`,
+        `Total Numbers in Range: ${totalNumbers}`,
+        `Picked Numbers: ${pickedNumbers.join(", ")} (${pickedNumbers.length})`,
+        `Cancelled Numbers: ${cancelledNumbers.join(", ")} (${cancelledNumbers.length})`,
+        `Removed Numbers: ${removedNumbers.join(", ")} (${removedNumbers.length})`,
+        `Status: ${status}`,
+        "",
+        `Date-Time: ${dateTime}`
+    ];
 
-    const blob = new Blob([content], { type: 'application/rtf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'Lottery_Details.rtf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Lottery Details", 105, 20, { align: "center" });
 
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+
+    let y = 40;
+    content.forEach(line => {
+        doc.text(line, 105, y, { align: "center" });
+        y += 10;
+    });
+
+    // Add Watermarks (Now perfectly covering the gaps)
+    addWatermarks(doc);
+
+    doc.save("Lottery_Details.pdf");
     showModal("Download Completed", 2000);
 }
 
+function addWatermarks(doc) {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(150); // Light gray color
+    doc.setGState(new doc.GState({ opacity: 0.2 })); // Wash-out effect
 
-// Modal Functions
-function showModal(message, duration) {
-    const modal = createModal(message);
-    document.body.appendChild(modal);
-    setTimeout(() => {
-        modal.remove();
-        document.getElementById('rollingBox').innerText = "---"; // Set the "rollingBox" back to "---"
-    }, duration);
-}
+    const watermarkText = "LotteryMachine by Mriganka (MMD)";
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-function showConfirmationModal(message, callback) {
-  const modal = createModal(message, true); // Pass true for confirmation modal
-  document.body.appendChild(modal);
+    // **Center Watermark (Main, Large One)**
+    doc.setFontSize(30);
+    doc.text(watermarkText, pageWidth / 4, pageHeight / 2, { angle: 45 });
 
-  const confirmButton = modal.querySelector('.modal-confirm');
-  const cancelButton = modal.querySelector('.modal-cancel');
+    // **Diagonal Watermarks (Smaller, Filling All Gaps)**
+    doc.setFontSize(22); // Smaller for better fit
 
-  confirmButton.addEventListener('click', () => {
-    modal.remove();
-    callback(true);
-  });
+    const startX = -50; // Start slightly off-page for better coverage
+    const startY = 30;
+    const stepY = 45; // Vertical spacing (slightly closer to fill gaps)
+    const stepX = 75; // Horizontal spacing (optimized to remove spaces)
 
-  cancelButton.addEventListener('click', () => {
-    modal.remove();
-    callback(false);
-  });
+    const centerX = pageWidth / 2;
+    const centerY = pageHeight / 2;
+    const exclusionRadiusX = 100; // Keeps space around the center watermark
+    const exclusionRadiusY = 60;  // Adjusted to fill gaps above & below
+
+    for (let y = startY; y < pageHeight + 100; y += stepY) {
+        for (let x = startX; x < pageWidth + 100; x += stepX) {
+            // **Ensure diagonal watermarks do not leave gaps above & below center**
+            if (
+                Math.abs(x - centerX) < exclusionRadiusX &&
+                Math.abs(y - centerY) < exclusionRadiusY
+            ) {
+                // **Add watermarks slightly above & below the center**
+                if (y < centerY - exclusionRadiusY) {
+                    doc.text(watermarkText, x, y - 20, { angle: 45 }); // Slightly above
+                } else if (y > centerY + exclusionRadiusY) {
+                    doc.text(watermarkText, x, y + 20, { angle: 45 }); // Slightly below
+                }
+                continue;
+            }
+            doc.text(watermarkText, x, y, { angle: 45 });
+        }
+    }
 }
 
 
@@ -1654,6 +1695,9 @@ document.head.appendChild(style);
 
 
     </script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </body>
 </html>
 
