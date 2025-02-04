@@ -551,9 +551,9 @@ updateRollingBoxStatus();
 
 function updatePickedNumbersDisplay() {
     if (pickedNumbers.length <= 10) {
-        pickedNumbersField.innerHTML = `Picked Numbers: <span>${pickedNumbers.join(', ')}</span>`;
+        pickedNumbersField.innerHTML = `Result: <span>${pickedNumbers.join(', ')}</span>`;
     } else {
-        pickedNumbersField.innerHTML = `Picked Numbers: <span>${pickedNumbers.slice(0, 10).join(', ')}</span>...`;
+        pickedNumbersField.innerHTML = `Result: <span>${pickedNumbers.slice(0, 10).join(', ')}</span>...`;
     }
 }
 
